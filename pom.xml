@@ -34,6 +34,10 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
@@ -53,32 +57,59 @@
 
   </dependencies>
 
-  <build>
 
+  <build>
     <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.4</version>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>3.5.6</version>
         <configuration>
-          <mainClass>com.example.YourApplication</mainClass>
+          <!-- 配置镜像信息 -->
+          <image>
+            <!-- 镜像名称 -->
+            <name>${project.artifactId}:${project.version}</name>
+          </image>
         </configuration>
         <executions>
           <execution>
+            <phase>package</phase>
             <goals>
-              <goal>repackage</goal>
+              <!-- 绑定到 package 阶段，执行 mvn package 时构建镜像 -->
+              <goal>build-image</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>3.3.2</version>
-        <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
-        </configuration>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <!-- 绑定到 package 之后执行 -->
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <!-- 停止并删除旧容器（若存在） -->
+                <exec executable="docker" failonerror="false">
+                  <arg line="rm -f ${project.artifactId}-container"/>
+                </exec>
+                <!-- 启动新容器 -->
+                <exec executable="docker">
+                  <arg line="run -d -p 8081:8081 --name ${project.artifactId}-container ${project.artifactId}:${project.version}"/>
+                </exec>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

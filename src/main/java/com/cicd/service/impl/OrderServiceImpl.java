@@ -1,7 +1,7 @@
-package com.scb.service.impl;
+package com.cicd.service.impl;
 
-import com.scb.pojo.Order;
-import com.scb.service.OrderService;
+import com.cicd.pojo.Order;
+import com.cicd.service.OrderService;
 import org.springframework.stereotype.Service;
 
 @Service

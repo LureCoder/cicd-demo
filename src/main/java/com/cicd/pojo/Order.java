@@ -1,4 +1,4 @@
-package com.scb.pojo;
+package com.cicd.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

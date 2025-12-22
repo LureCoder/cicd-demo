@@ -1,7 +1,9 @@
-package com.scb.service;
+package com.cicd.service;
 
-import com.scb.pojo.Order;
+import com.cicd.pojo.Order;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface OrderService {
 
     Order queryOrder(String orderId);
